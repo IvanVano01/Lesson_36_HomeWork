@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Assets.HomeWork.Develop.CommonServices.CoroutinePerformer
 {
-    public class CoroutinePerformer : MonoBehaviour, ICoroutinePerformer // для запуска корутин
+    public class CoroutinePerformer: MonoBehaviour, ICoroutinePerformer // для запуска корутин
     {
         private void Awake()
         {

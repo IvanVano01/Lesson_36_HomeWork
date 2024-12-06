@@ -2,7 +2,9 @@
 using UnityEngine;
 using Assets.HomeWork.Develop.CommonServices.AssetManagment;
 using Assets.HomeWork.Develop.CommonServices.CoroutinePerformer;
-
+using System;
+using System.ComponentModel;
+using Assets.HomeWork.Develop.CommonServices.LoadingScreen;
 
 namespace Assets.HomeWork.Develop.EntryPoint
 {
@@ -21,10 +23,11 @@ namespace Assets.HomeWork.Develop.EntryPoint
             // это родительский контейнер
 
             RegisterResourcesAssetLoader(projectContainer);// регестрируем подгрузку из папки ресурсов, "с" - контейнер
-            RegidterCoroutinePerformer(projectContainer);// регаем и подгружаем сервис запуска корутин
+            RegisterCoroutinePerformer(projectContainer);// регаем и подгружаем сервис запуска корутин
+            RegisterSceneLoader(projectContainer);// регестрируем загрузочную шторку и ....
 
             // все регистрации глобальные прошли
-             
+
             projectContainer.Resolve<ICoroutinePerformer>().StartPerform(_gameBootstrap.Run(projectContainer));// из контеёнер достаём сервис старта
         }
 
@@ -39,14 +42,27 @@ namespace Assets.HomeWork.Develop.EntryPoint
             container.RegisterAsSingle<ResourcesAssetLoader>(c => new ResourcesAssetLoader());
         }
 
-        private void RegidterCoroutinePerformer(DIContainer container)//метод регистрации подгрузки ресурсов из папки "Recources" сервиса запуска корутин
+        private void RegisterCoroutinePerformer(DIContainer container)//метод регистрации подгрузки ресурсов из папки "Recources" сервиса запуска корутин
         {
             container.RegisterAsSingle<ICoroutinePerformer>(c =>
             {
                 ResourcesAssetLoader resourcesAssetLoader = c.Resolve<ResourcesAssetLoader>();// запрашиваем из контейнера "RecourcesAssetLoader"
-                CoroutinePerformer coroutinePerformerPrefab = resourcesAssetLoader.LoadResource<CoroutinePerformer>("Infrastructure/CoroutinePerformer");// подгружаем из папки ресурсов префаб                            
+                CoroutinePerformer coroutinePerformerPrefab = resourcesAssetLoader
+                .LoadResource<CoroutinePerformer>(InfrastructurePath.CoroutinePerformerPath);// подгружаем из папки ресурсов префаб                            
 
                 return Instantiate(coroutinePerformerPrefab);  // создаём префаб на сцене 
+            });
+        }
+
+        private void RegisterSceneLoader(DIContainer container)
+        {
+            container.RegisterAsSingle<ILoadingCurtain>(c =>
+            {
+                ResourcesAssetLoader resourcesAssetLoader = c.Resolve<ResourcesAssetLoader>();
+                StandardLoadingCurtain standardLoadingCurtainPrefab = resourcesAssetLoader
+                .LoadResource<StandardLoadingCurtain>(InfrastructurePath.LoadingCurtain);
+
+                return Instantiate(standardLoadingCurtainPrefab);
             });
         }
     }
