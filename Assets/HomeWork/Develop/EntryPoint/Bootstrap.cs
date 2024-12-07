@@ -1,5 +1,6 @@
 ﻿using Assets.HomeWork.Develop.CommonServices.DI;
 using Assets.HomeWork.Develop.CommonServices.LoadingScreen;
+using Assets.HomeWork.Develop.CommonServices.SceneManagment;
 using System.Collections;
 using UnityEngine;
 
@@ -13,6 +14,8 @@ namespace Assets.HomeWork.Develop.EntryPoint
         {
             //Включаем загрузочную штору после всех регистраций
             ILoadingCurtain loadingCurtain = container.Resolve<ILoadingCurtain>();
+            SceneSwitcher sceneSwitcher = container.Resolve<SceneSwitcher>();
+
             loadingCurtain.Show();
 
             Debug.Log("Начинается инициализация сервисов в Bootstrap !");
@@ -26,6 +29,8 @@ namespace Assets.HomeWork.Develop.EntryPoint
 
             Debug.Log("Завершается инициализация сервисов в Bootstrap, наченаем переход на другую сцену!");
             // переход на следующую сцену с помощью сервиса смены сцены
+
+            sceneSwitcher.ProcessSwitcherSceneFor(new OutputBootstrapArgs(new MainMenuInputArgs()));
         }
     }
 }
