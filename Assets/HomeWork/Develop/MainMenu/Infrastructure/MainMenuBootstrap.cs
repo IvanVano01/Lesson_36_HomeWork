@@ -1,3 +1,5 @@
+using Assets.HomeWork.Develop.CommonServices.DataManagment;
+using Assets.HomeWork.Develop.CommonServices.DataManagment.DataProviders;
 using Assets.HomeWork.Develop.CommonServices.DI;
 using Assets.HomeWork.Develop.CommonServices.SceneManagment;
 using System.Collections;
@@ -25,11 +27,34 @@ namespace Assets.HomeWork.Develop.MainMenu.Infrastructure
             // ƒелаем регистрации дл€ сцены гейплэ€
         }
 
-        private void Update()// дл€ теста
+        private void Update()
         {
-            if(Input.GetKeyDown(KeyCode.Space))
+            if(Input.GetKeyDown(KeyCode.Space))// дл€ теста
             {
                 _container.Resolve<SceneSwitcher>().ProcessSwitcherSceneFor(new OutputMainMenuArgs(new GameplayInputArgs(2)));
+            }
+
+            if(Input.GetKeyDown(KeyCode.S))
+            {
+                ISaveLoadService saveLoadService = _container.Resolve<ISaveLoadService>();
+
+                if(saveLoadService.TryLoad(out PlayerData playerData ))// пробуем загрузить данные
+                {
+                    playerData.Money++;
+                    playerData.CompletedLevels.Add(playerData.Money);
+
+                    saveLoadService.Save(playerData);
+                }
+                else
+                {
+                    PlayerData originPlayerData = new PlayerData()// если данных ещЄ нет, то создаЄм данные по умолчанию
+                    {
+                        Money = 0,
+                        CompletedLevels = new()
+                    };
+
+                    saveLoadService.Save(originPlayerData);
+                }
             }
         }
     }

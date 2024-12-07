@@ -5,6 +5,7 @@ using Assets.HomeWork.Develop.CommonServices.CoroutinePerformer;
 using Assets.HomeWork.Develop.CommonServices.LoadingScreen;
 using Assets.HomeWork.Develop.CommonServices.SceneManagment;
 using System;
+using Assets.HomeWork.Develop.CommonServices.DataManagment;
 
 namespace Assets.HomeWork.Develop.EntryPoint
 {
@@ -29,17 +30,22 @@ namespace Assets.HomeWork.Develop.EntryPoint
             RegisterSceneLoader(projectContainer);// регестрируем сервис для загрузки других сцен 
             RegisterSceneSwitcher(projectContainer);// регаем сервис для перехода в другие сцены
 
+            RegisterSaveLoadService(projectContainer); // регаем сервис сохранений данных в формате Json
 
             // все регистрации глобальные прошли
 
             projectContainer.Resolve<ICoroutinePerformer>().StartPerform(_gameBootstrap.Run(projectContainer));// из контеёнер достаём сервис старта
-        }      
+        }
 
         private void SetupAppSettings()
         {
             QualitySettings.vSyncCount = 0;
             Application.targetFrameRate = 144;
         }
+
+        private void RegisterSaveLoadService(DIContainer container)
+            => container.RegisterAsSingle<ISaveLoadService>(c => new SaveLoadService(new JsonSerializer(), new LocalDataRepository()));
+        
 
         private void RegisterSceneSwitcher(DIContainer container)
         {
