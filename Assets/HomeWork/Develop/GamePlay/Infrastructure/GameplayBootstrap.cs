@@ -1,9 +1,8 @@
 using Assets.HomeWork.Develop.CommonServices.DI;
 using Assets.HomeWork.Develop.CommonServices.SceneManagment;
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 namespace Assets.HomeWork.Develop.GamePlay.Infrastructure
 {
@@ -19,22 +18,31 @@ namespace Assets.HomeWork.Develop.GamePlay.Infrastructure
 
             Debug.Log($"ѕодружаем ресурсы дл€ уровн€ {gameplayInputArgs.LevelNumber}");
             Debug.Log("—оздаЄм персонажа");
-            Debug.Log("—цена готова, можно начинать игру");
+
 
             yield return new WaitForSeconds(1f);// симулируем ожидание
+
+            Debug.Log("—цена готова, можно начинать игру");
+
         }
 
         private void ProcessRegistrations()
         {
             // ƒелаем регистрации дл€ сцены гейплэ€
+
+            _container.Initialize();// инициализируем контейнер, на предмет маркировки и создани€ объектов,
+                                    // которые нужны до за ранее, до первого запроса их
         }
 
         private void Update()// дл€ теста
         {
+
             if (Input.GetKeyDown(KeyCode.Space))
             {
-                _container.Resolve<SceneSwitcher>().ProcessSwitcherSceneFor(new OutputGamplayArgs(new MainMenuInputArgs()));
+                _container.Resolve<SceneSwitcher>().ProcessSwitcherSceneFor(new OutputGameplayArgs(new MainMenuInputArgs()));
             }
-        }
+
+            
+        }        
     }
 }

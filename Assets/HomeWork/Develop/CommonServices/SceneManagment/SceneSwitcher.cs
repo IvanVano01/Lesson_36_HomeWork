@@ -44,7 +44,7 @@ namespace Assets.HomeWork.Develop.CommonServices.SceneManagment
                     _coroutinePerformer.StartPerform(ProcessSwitcherFromMainMenuScene(outputMainMenuArgs));
                     break;
 
-                case OutputGamplayArgs outputGamplayArgs: // если это сцена Gamplay
+                case OutputGameplayArgs outputGamplayArgs: // если это сцена Gamplay
                     _coroutinePerformer.StartPerform(ProcessSwitcherFromGameplayScene(outputGamplayArgs));
                     break;
 
@@ -78,13 +78,19 @@ namespace Assets.HomeWork.Develop.CommonServices.SceneManagment
             }
         }
 
-        private IEnumerator ProcessSwitcherFromGameplayScene(OutputGamplayArgs outputGamplayArgs)
+        private IEnumerator ProcessSwitcherFromGameplayScene(OutputGameplayArgs outputGamplayArgs)
         {
             switch (outputGamplayArgs.NextSceneInputArgs) // определяем варианты перехода из сцены Gameplay
             {
                 case MainMenuInputArgs mainMenuInputArgs: //из геймплэя можем перейти только в главное меню
                     yield return ProcessSwitchToMainMenuScene(mainMenuInputArgs);
-                    break;                
+                    break;
+
+                //--------------------------------------------------------------------------------------------//
+                case GameplayInputArgs gameplayInputArgs: //из геймплэя  в геймплэй
+                    yield return ProcessSwitchToGameplayScene(gameplayInputArgs);
+                    break;
+                //--------------------------------------------------------------------------------------------//
 
                 default:
                     throw new ArgumentException(ErrorSceneTransitionMessage);
@@ -94,6 +100,8 @@ namespace Assets.HomeWork.Develop.CommonServices.SceneManagment
         private IEnumerator ProcessSwitchToMainMenuScene(MainMenuInputArgs mainMenuInputArgs)// для перехода на сцену главного меню
         {
             _loadingCurtain.Show();// показываем штору
+
+            _currentSceneContainer?.Dispose();// при переходе на другую сцену вызываем метод отписки от всяких подписок
 
             yield return _sceneLoader.LoadAsync(SceneID.Empty);// сначала переходим на пустую сцену
             yield return _sceneLoader.LoadAsync(SceneID.MainMenu);// переходим на сцену главного меню
@@ -112,6 +120,8 @@ namespace Assets.HomeWork.Develop.CommonServices.SceneManagment
         private IEnumerator ProcessSwitchToGameplayScene(GameplayInputArgs gameplayInputArgs)// для перехода на сцену геймплэя
         {
             _loadingCurtain.Show();
+
+            _currentSceneContainer?.Dispose();// при переходе на другую сцену вызываем метод отписки от всяких подписок
 
             yield return _sceneLoader.LoadAsync(SceneID.Empty);// сначала переходим на пустую сцену
             yield return _sceneLoader.LoadAsync(SceneID.GamePlay);// переходим на сцену геймплэя

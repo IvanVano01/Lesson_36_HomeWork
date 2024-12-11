@@ -1,8 +1,9 @@
-using Assets.HomeWork.Develop.CommonServices.DataManagment;
 using Assets.HomeWork.Develop.CommonServices.DataManagment.DataProviders;
 using Assets.HomeWork.Develop.CommonServices.DI;
 using Assets.HomeWork.Develop.CommonServices.SceneManagment;
+using Assets.HomeWork.Develop.CommonServices.Wallet;
 using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace Assets.HomeWork.Develop.MainMenu.Infrastructure
@@ -20,41 +21,35 @@ namespace Assets.HomeWork.Develop.MainMenu.Infrastructure
             Debug.Log($"Подружаем ресурсы для сцены {mainMenuInputArgs}");            
 
             yield return new WaitForSeconds(1f);// симулируем ожидание
+            
         }
 
         private void ProcessRegistrations()
         {
             // Делаем регистрации для сцены гейплэя
+
+            _container.Initialize();// инициализируем контейнер, на предмет маркировки и создания объектов,
+                                          // которые нужны до за ранее, до первого запроса их
         }
 
         private void Update()
-        {
-            if(Input.GetKeyDown(KeyCode.Space))// для теста
+        {            
+            if (Input.GetKeyDown(KeyCode.Space))// для теста
             {
                 _container.Resolve<SceneSwitcher>().ProcessSwitcherSceneFor(new OutputMainMenuArgs(new GameplayInputArgs(2)));
             }
 
-            if(Input.GetKeyDown(KeyCode.S))
+            if(Input.GetKeyDown(KeyCode.F))
             {
-                ISaveLoadService saveLoadService = _container.Resolve<ISaveLoadService>();
+                WalletService wallet = _container.Resolve<WalletService>();
+                wallet.Add(CurrencyTypes.Gold, 100);
+                Debug.Log($"В кошклёк Gold = {wallet.GetCurrency(CurrencyTypes.Gold).Value}");
+            }
 
-                if(saveLoadService.TryLoad(out PlayerData playerData ))// пробуем загрузить данные
-                {
-                    playerData.Money++;
-                    playerData.CompletedLevels.Add(playerData.Money);
-
-                    saveLoadService.Save(playerData);
-                }
-                else
-                {
-                    PlayerData originPlayerData = new PlayerData()// если данных ещё нет, то создаём данные по умолчанию
-                    {
-                        Money = 0,
-                        CompletedLevels = new()
-                    };
-
-                    saveLoadService.Save(originPlayerData);
-                }
+            if (Input.GetKeyDown(KeyCode.S))
+            {
+                _container.Resolve<PlayerDataProvider>().Save();// у контейнера, запрашиваем "PlayerDataProvider" и у него вызываем метод сохранения
+                Debug.Log(" Сохранили данные!");
             }
         }
     }

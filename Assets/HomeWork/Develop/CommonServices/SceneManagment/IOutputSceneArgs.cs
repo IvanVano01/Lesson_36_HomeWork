@@ -16,9 +16,9 @@
         public IInputSceneArgs NextSceneInputArgs {get;}
     }
 
-    public class OutputGamplayArgs : OutputSeneArgs
+    public class OutputGameplayArgs : OutputSeneArgs
     {
-        public OutputGamplayArgs(IInputSceneArgs nextSceneInputArgs) : base(nextSceneInputArgs) // конструктор
+        public OutputGameplayArgs(IInputSceneArgs nextSceneInputArgs) : base(nextSceneInputArgs) // конструктор
         {
             // если надо то сюда пишем результат gameplay сцены который нужно передать в главное меню например
         }

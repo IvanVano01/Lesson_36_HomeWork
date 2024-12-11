@@ -6,6 +6,8 @@ using Assets.HomeWork.Develop.CommonServices.LoadingScreen;
 using Assets.HomeWork.Develop.CommonServices.SceneManagment;
 using System;
 using Assets.HomeWork.Develop.CommonServices.DataManagment;
+using Assets.HomeWork.Develop.CommonServices.DataManagment.DataProviders;
+using Assets.HomeWork.Develop.CommonServices.Wallet;
 
 namespace Assets.HomeWork.Develop.EntryPoint
 {
@@ -25,13 +27,18 @@ namespace Assets.HomeWork.Develop.EntryPoint
 
             RegisterResourcesAssetLoader(projectContainer);// регестрируем подгрузку из папки ресурсов, "с" - контейнер
             RegisterCoroutinePerformer(projectContainer);// регаем и подгружаем сервис запуска корутин
-            
+
             RegisterLoadingCurtain(projectContainer);// регестрируем загрузочную шторку 
             RegisterSceneLoader(projectContainer);// регестрируем сервис для загрузки других сцен 
             RegisterSceneSwitcher(projectContainer);// регаем сервис для перехода в другие сцены
 
             RegisterSaveLoadService(projectContainer); // регаем сервис сохранений данных в формате Json
+            RegisterPlayerDataProvider(projectContainer); //регаем дату, в которой будут храниться данные для игрока
+            RegisterWalletService(projectContainer);// регаем сервис кошелька
 
+            projectContainer.Initialize();// инициализируем контейнер, на предмет маркировки и создания объектов,
+                                          // которые нужны до за ранее, до первого запроса их
+            
             // все регистрации глобальные прошли
 
             projectContainer.Resolve<ICoroutinePerformer>().StartPerform(_gameBootstrap.Run(projectContainer));// из контеёнер достаём сервис старта
@@ -43,17 +50,24 @@ namespace Assets.HomeWork.Develop.EntryPoint
             Application.targetFrameRate = 144;
         }
 
+        private void RegisterPlayerDataProvider(DIContainer сontainer)
+         => сontainer.RegisterAsSingle<PlayerDataProvider>(c => new PlayerDataProvider(c.Resolve<ISaveLoadService>()));
+
+        private void RegisterWalletService(DIContainer сontainer)
+        => сontainer.RegisterAsSingle(c => new WalletService(c.Resolve<PlayerDataProvider>())).NonLazy();// сервис помечен как "NonLazy" должен создаться за ранее,
+                                                                                                         // не дожидаясь первого запроса на него
+
         private void RegisterSaveLoadService(DIContainer container)
             => container.RegisterAsSingle<ISaveLoadService>(c => new SaveLoadService(new JsonSerializer(), new LocalDataRepository()));
-        
+
 
         private void RegisterSceneSwitcher(DIContainer container)
         {
-           container.RegisterAsSingle(c => new SceneSwitcher(
-               c.Resolve<ICoroutinePerformer>(), 
-               c.Resolve<ILoadingCurtain>(), 
-               c.Resolve<ISeneLoader>(), 
-               c));
+            container.RegisterAsSingle(c => new SceneSwitcher(
+                c.Resolve<ICoroutinePerformer>(),
+                c.Resolve<ILoadingCurtain>(),
+                c.Resolve<ISeneLoader>(),
+                c));
         }
 
         private void RegisterResourcesAssetLoader(DIContainer container)// метод регистрации подгрузки ресурсов из папки "Recources"
