@@ -1,4 +1,5 @@
-﻿using Assets.HomeWork.Develop.CommonServices.Wallet;
+﻿using Assets.HomeWork.Develop.CommonServices.ConfigsManagment;
+using Assets.HomeWork.Develop.CommonServices.Wallet;
 using System;
 using System.Collections.Generic;
 
@@ -8,8 +9,11 @@ namespace Assets.HomeWork.Develop.CommonServices.DataManagment.DataProviders
     {
         // тут будем передавать сервис конфигов
         // и из кофигов вытягивать начальные данные
-        public PlayerDataProvider(ISaveLoadService saveLoadService) : base(saveLoadService)
+        private ConfigsProviderService _configProviderService;// поле для провайдера конфигов
+
+        public PlayerDataProvider(ISaveLoadService saveLoadService, ConfigsProviderService configsProviderService) : base(saveLoadService)
         {
+            _configProviderService = configsProviderService;
         }
 
         protected override PlayerData GetOriginData()
@@ -25,7 +29,7 @@ namespace Assets.HomeWork.Develop.CommonServices.DataManagment.DataProviders
             Dictionary<CurrencyTypes, int> walletData = new();
 
             foreach (CurrencyTypes currencyType in Enum.GetValues(typeof(CurrencyTypes)))// перебераем энамку с валютами
-                walletData.Add(currencyType, 0);// добавляем валюты из энамки
+                walletData.Add(currencyType, _configProviderService.StartWalletConfig.GetStartValueFor(currencyType));// добавляем валюты из конфига
 
             return walletData;
         }    

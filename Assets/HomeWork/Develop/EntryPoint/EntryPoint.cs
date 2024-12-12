@@ -8,6 +8,7 @@ using System;
 using Assets.HomeWork.Develop.CommonServices.DataManagment;
 using Assets.HomeWork.Develop.CommonServices.DataManagment.DataProviders;
 using Assets.HomeWork.Develop.CommonServices.Wallet;
+using Assets.HomeWork.Develop.CommonServices.ConfigsManagment;
 
 namespace Assets.HomeWork.Develop.EntryPoint
 {
@@ -35,6 +36,7 @@ namespace Assets.HomeWork.Develop.EntryPoint
             RegisterSaveLoadService(projectContainer); // регаем сервис сохранений данных в формате Json
             RegisterPlayerDataProvider(projectContainer); //регаем дату, в которой будут храниться данные для игрока
             RegisterWalletService(projectContainer);// регаем сервис кошелька
+            RegisterConfigProviderService(projectContainer);// регаем сервис подгрузки конфигов
 
             projectContainer.Initialize();// инициализируем контейнер, на предмет маркировки и создания объектов,
                                           // которые нужны до за ранее, до первого запроса их
@@ -50,8 +52,11 @@ namespace Assets.HomeWork.Develop.EntryPoint
             Application.targetFrameRate = 144;
         }
 
+        private void RegisterConfigProviderService(DIContainer container)
+        => container.RegisterAsSingle(c => new ConfigsProviderService(c.Resolve<ResourcesAssetLoader>()));
+
         private void RegisterPlayerDataProvider(DIContainer сontainer)
-         => сontainer.RegisterAsSingle<PlayerDataProvider>(c => new PlayerDataProvider(c.Resolve<ISaveLoadService>()));
+         => сontainer.RegisterAsSingle(c => new PlayerDataProvider(c.Resolve<ISaveLoadService>(), c.Resolve<ConfigsProviderService>()));
 
         private void RegisterWalletService(DIContainer сontainer)
         => сontainer.RegisterAsSingle(c => new WalletService(c.Resolve<PlayerDataProvider>())).NonLazy();// сервис помечен как "NonLazy" должен создаться за ранее,

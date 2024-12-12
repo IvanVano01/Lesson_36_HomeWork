@@ -20,10 +20,10 @@ namespace Assets.HomeWork.Develop.CommonServices.DI
 
         public Registration RegisterAsSingle<T>(Func<DIContainer, T> creator)// метод регистрации зависимости в единственном экземпляре
         {
-            if (_container.ContainsKey(typeof(T))) // если конеёнер уже содержит регистрацию того типа который хотим зарегестрировать, выкидываем ошибку
+            if (IsAlreadyRegister<T>())// проверка запрашивоемой регистрации в локалкальном контейнере и родительском
                 throw new InvalidOperationException($"{nameof(T)} Такой тип уже зарегистрован! ");
 
-            Registration registration = new Registration(container => creator(container));// создаём регистрацию и указываем способ создания????????????????????
+            Registration registration = new Registration(container => creator(container));// создаём регистрацию и указываем способ создания
 
             // 1) создаём экземпляр класса "Registration" и передаём в его конструктор параметры 
             // 2) в качестве параметров, передаём DI контейнер и у него вызываем делегат " Funk Creator" который вернёт зареганный объект
@@ -32,6 +32,17 @@ namespace Assets.HomeWork.Develop.CommonServices.DI
             _container[typeof(T)] = registration;// вариант записи
 
             return registration;
+        }
+
+        public bool IsAlreadyRegister<T>()// проверка запрашивоемой регистрации в локалкальном контейнере и родительском
+        {
+            if (_container.ContainsKey(typeof(T))) // если локальный контейнер уже содержит регистрацию того типа, которую хотим зарегать
+                return true;
+
+            if(_parent != null) // проверяем что родительский контейнер зареган и смотрим запрашиваемую регистрацию у родительского контейнера
+                return _parent.IsAlreadyRegister<T>();
+
+            return false; // если нет запрашиваемой регистрации в локальном контейнере и родительском, то всё ок, возвращаем" false"
         }
 
         public T Resolve<T>()// метод для получения зарегестрированных объектов, смотрим зареганый объект в локальном контейнере, если нет то в родительском контейнере

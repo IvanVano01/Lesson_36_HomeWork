@@ -1,4 +1,5 @@
-﻿using Assets.HomeWork.Develop.CommonServices.DataManagment.DataProviders;
+﻿using Assets.HomeWork.Develop.CommonServices.ConfigsManagment;
+using Assets.HomeWork.Develop.CommonServices.DataManagment.DataProviders;
 using Assets.HomeWork.Develop.CommonServices.DI;
 using Assets.HomeWork.Develop.CommonServices.LoadingScreen;
 using Assets.HomeWork.Develop.CommonServices.SceneManagment;
@@ -22,6 +23,8 @@ namespace Assets.HomeWork.Develop.EntryPoint
             Debug.Log("Начинается инициализация сервисов в Bootstrap !");
 
             // Инициализация всех сервисов(конфиги, инит сервисы рекламы/ аналитики)
+
+            container.Resolve<ConfigsProviderService>().LoadAll();// подгружаем конфиги
 
             container.Resolve<PlayerDataProvider>().Load();// загружаем начальные данные для игрока(из конфигов и т.д)
 
